@@ -283,10 +283,29 @@ y)$ without knowing $x$~\cite{coron}. This is the structure that the
 (length extension specifically): re-hashing the full digest is intended to
 seal the inner chaining value behind a second, length-committed
 invocation, so that the length-extension distinguisher does not reach the
-mining map. (This is the standard envelope intuition for why
-double hashing is used; it does not literally instantiate the chop or HMAC
-constructions of~\cite{coron}, and we claim no formal indifferentiability
-proof for $\SHAd$.) Indifferentiability composes for single-stage games;
+mining map. The literature comes close to this composition from both
+sides without covering it. Coron et al.~\cite{coron} prove plain
+Merkle--Damgård indifferentiable (with birthday bounds) on prefix-free
+inputs, of which fixed-length inputs are a special case---so a
+\emph{single} $\SHA$ restricted to 80-byte headers is covered---and
+separately prove indifferentiability of the double hash
+$H(H(0^{\kappa}\Vert M))$, which differs from $\SHAd$ only by the
+prepended zero block whose role is to domain-separate the outer
+single-compression call from adversarially controlled first message
+blocks; $\SHAd$ omits that block, so the theorem does not literally
+apply. Dodis et al.~\cite{drst} analyze the unrestricted double hash
+$H^{2}(M)=H(H(M))$ and show it is indifferentiable only with weak
+bounds (any successful simulator must make
+$\Omega(\min\{q_{1}q_{2},2^{n/2}\})$ queries, capping
+composition-derived security near $2^{n/4}$); their differentiating
+attack, however, requires feeding $n$-bit digests back into the
+construction, which the mining map's fixed 80-byte domain forbids, and
+they prove no positive result for the domain-restricted composition.
+No published theorem covers $\SHAd$ on its fixed-length domain, so we
+state indifferentiability of the mining map as an explicit assumption,
+consistent with formal treatments of Bitcoin that model the mining
+function as a random oracle directly~\cite{backbone}.
+Indifferentiability composes for single-stage games;
 multi-stage settings can require more care~\cite{rss}, but the mining
 experiment is single-stage---one adversary, one search.
 
@@ -679,6 +698,12 @@ FSE 2001.
 J.-S.~Coron, Y.~Dodis, C.~Malinaud, P.~Puniya.
 \emph{Merkle-Damg\aa rd Revisited: How to Construct a Hash Function.}
 CRYPTO 2005.
+
+\bibitem{drst}
+Y.~Dodis, T.~Ristenpart, J.~Steinberger, S.~Tessaro.
+\emph{To Hash or Not to Hash Again? (In)differentiability Results for
+$H^2$ and HMAC.}
+CRYPTO 2012.
 
 \bibitem{gkp}
 J.~Garay, A.~Kiayias, G.~Panagiotakos.

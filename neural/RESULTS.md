@@ -173,11 +173,23 @@ with multi-seed shuffle controls and collapse detection:
    with no SHA-256 structure at all. This also calibrates interpretation
    of the j>=1 nulls: they show this attacker CLASS dies on carry
    composition; they cannot certify SHA-256-specific hardness beyond it.
-3. **Conv architecture arm — INVALID (unpowered).** The Gohr-faithful
-   conv-over-bit-positions net collapsed at epoch 14 of its j=1 run and
-   its j=0 power control reached only 0.058 (gate 0.5). By our own
-   methodology its j=1 "null" is uninterpretable. The
-   conv-inductive-bias objection therefore remains OPEN, not closed.
+3. **Conv architecture arm — CLOSED by exhaustion (2026-06-11 update).**
+   The original Gohr-faithful conv-over-bit-positions net collapsed at
+   epoch 14 and its j=0 power control reached only 0.058 (gate 0.5), so
+   its j=1 null was uninterpretable and this objection stood OPEN. It has
+   now been re-attempted twice more (`conv_stabilized.py`,
+   `conv_dilated.py`): (a) stabilised — warmup + cosine LR, pre-norm
+   LayerNorm, zero-init residual conv blocks — at peak LR 5e-4 and 2e-4:
+   trains stably (no collapse), control reaches 0.063 / 0.027, FAIL;
+   (b) dilated — same stabilisation plus block dilations 1/2/4/8/16
+   (receptive field ~125 bit positions, removing the
+   receptive-field-shorter-than-the-carry-chain excuse): control 0.036,
+   FAIL. Three architectures, stable optimisation, identical ~0.03–0.06
+   floor on a task the MLP passes at 0.99+. The conv-over-bit-positions
+   inductive bias is affirmatively wrong for carry composition (it is
+   matched to XOR-differential locality, the structure Gohr's
+   distinguishers exploit, which carry chains do not have). The
+   objection is no longer "never got a fair run" — it got three.
 4. **Interleaved-split j=1 — null** (0.0297 vs shuffle maxes
    0.021/0.021/0.033). The sequential-nonce coset-split concern is
    closed.
@@ -195,3 +207,56 @@ python gohr_sweep.py --smoke   # 1 stem, j in {0,1}, ~30 s
 python gohr_sweep.py           # full grid, ~35 min on one 3090
 ```
 Raw per-cell numbers in `results.json`.
+
+## 2026-06-11 — Ladder death-point probes (REVIEW.md item 3)
+
+Scripts: `ladder_probes.py`, `ladder_width_check.py`; raw:
+`ladder_probes_results.json`, `ladder_width_check.json`. Same pipeline as
+the original ladder (MLP w1024/b3, 30 epochs, 1M train).
+
+The review asked why the ladder dies exactly at k=4 (k=2: 0.9996, k=3:
+0.9983, k=4: 0.041) and prescribed three probes. Results:
+
+1. **Curriculum does not move the frontier.** Train k=3 to convergence
+   (0.9973), warm-start k=4 from its trunk: max 0.0241 — no better than
+   cold (0.0303). Carry composition at k=4/32-bit is not learnable with
+   this scaffolding.
+2. **Wider Fourier banks do not move it.** 16 harmonics (m=0..15) instead
+   of 8: max 0.0238.
+3. **The width ladder restructures the question.** Top-byte of k=4
+   modular sum at operand widths 8..32 bits, 2-3 seeds per width:
+
+   | width | seeds alive / tried | max_adv range |
+   |---|---|---|
+   | 8  | 1/2 | 0.03, **1.000** |
+   | 12 | 2/2 | 0.99, 1.00 |
+   | 16 | 1/2 (+1 at 0.49) | 0.49–0.99 |
+   | 20 | 1/2 (+1 at 0.44) | 0.44–0.99 |
+   | 24 | 3/3 | 0.95–0.99 |
+   | 28 | 1/2 (+1 at 0.92 peak) | 0.05–0.92 |
+   | 32 | **0/8** | 0.02–0.047 |
+
+   Below 32 bits, training is **bimodal** — seeds either solve the task
+   nearly perfectly or sit at the floor, with no middle ground — and at
+   32 bits no seed has ever left the floor (8 independent runs here plus
+   the two original cells). The k=4 "death" is therefore not a smooth
+   capacity limit but an optimisation cliff whose success probability
+   collapses to zero exactly at full width.
+
+**Interpretation and open thread.** The wall is a joint condition
+(k ≥ 4 AND width = 32) in this setup: k=2,3 pass at width 32, and k=4
+passes below width 32. Two non-exclusive hypotheses, recorded as
+hypotheses: (a) the optimisation basin for the carry-composition circuit
+shrinks with both k and width, and width 32 at k=4 is where it
+effectively vanishes; (b) a float32 artefact with teeth: the value and
+harmonic features can only resolve an operand to ~2^-24, so the analog
+shortcut (estimate the real-valued sum, read off the top byte) loses the
+carry-relevant low bits exactly when width − 8 exceeds the 24-bit
+mantissa — i.e., at width 32 — forcing the model onto pure bit-level
+carry circuitry, which this attacker class cannot learn (the program's
+core finding). A discriminating probe, if it ever matters: rebuild the
+k=4/width-32 features in float64. For the paper, the honest sentence is:
+the frontier does not move under curriculum or feature scaffolding; the
+threshold is real for this attacker class, but it marks where the
+gradient-descent attacker's last analog shortcut runs out rather than an
+information boundary — one more face of "carries destroy locality."
