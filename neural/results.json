@@ -1,0 +1,97 @@
+{
+  "stem0_j0": {
+    "score_adv": 0.8834706850649179,
+    "net_max_adv": 0.9972402563372686,
+    "net_final_adv": 0.9795909109435732,
+    "verdict": "POSITIVE-CONTROL PASS"
+  },
+  "stem0_j1": {
+    "score_adv": 0.002376462332237206,
+    "net_max_adv": 0.030737491309054343,
+    "net_final_adv": -0.012363758864824437,
+    "verdict": "null"
+  },
+  "stem0_j2": {
+    "score_adv": -0.0028598534164643308,
+    "net_max_adv": 0.025390637099136693,
+    "net_final_adv": -0.016086828840243372,
+    "verdict": "null"
+  },
+  "stem0_j3": {
+    "score_adv": -0.005898912349005636,
+    "net_max_adv": 0.030914548673561804,
+    "net_final_adv": -0.0025905255876681466,
+    "verdict": "null"
+  },
+  "stem0_j4": {
+    "score_adv": -0.002392035297990258,
+    "net_max_adv": 0.03453533586935198,
+    "net_final_adv": -0.005194900882238951,
+    "verdict": "null"
+  },
+  "shuffle_control_j1": {
+    "net_max_adv": 0.021218643654358882,
+    "net_final_adv": 0.0014333948642326622,
+    "ok": true
+  },
+  "stem1_j0": {
+    "score_adv": 0.8836011458575279,
+    "net_max_adv": 0.9990070712330248,
+    "net_final_adv": 0.9771856405703889,
+    "verdict": "POSITIVE-CONTROL PASS"
+  },
+  "stem1_j1": {
+    "score_adv": 0.026839215622742385,
+    "net_max_adv": 0.02694251746928833,
+    "net_final_adv": -0.0007921153311314377,
+    "verdict": "null"
+  },
+  "stem1_j2": {
+    "score_adv": 0.0030452876634687875,
+    "net_max_adv": 0.021591911356134585,
+    "net_final_adv": -0.010065586670355842,
+    "verdict": "null"
+  },
+  "stem1_j3": {
+    "score_adv": 0.032986853147655926,
+    "net_max_adv": 0.03310929571668031,
+    "net_final_adv": -0.007560768850849664,
+    "verdict": "null"
+  },
+  "stem1_j4": {
+    "score_adv": 0.013905201903181785,
+    "net_max_adv": 0.021100427902356667,
+    "net_final_adv": 0.0008870945546481934,
+    "verdict": "null"
+  },
+  "stem2_j0": {
+    "score_adv": 0.8853321020584113,
+    "net_max_adv": 0.9971785379484819,
+    "net_final_adv": 0.9863182091550705,
+    "verdict": "POSITIVE-CONTROL PASS"
+  },
+  "stem2_j1": {
+    "score_adv": 0.00904703425313802,
+    "net_max_adv": 0.029626901840150044,
+    "net_final_adv": -0.004777492755284385,
+    "verdict": "null"
+  },
+  "stem2_j2": {
+    "score_adv": 0.014807144513706905,
+    "net_max_adv": 0.03105941907918952,
+    "net_final_adv": 0.005232368458548353,
+    "verdict": "null"
+  },
+  "stem2_j3": {
+    "score_adv": 0.009538320810435374,
+    "net_max_adv": 0.02723362491126302,
+    "net_final_adv": -0.0018432558523369114,
+    "verdict": "null"
+  },
+  "stem2_j4": {
+    "score_adv": 0.013385260294520696,
+    "net_max_adv": 0.03717736310796205,
+    "net_final_adv": 0.00719463415541155,
+    "verdict": "null"
+  }
+}

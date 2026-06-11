@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.log
+# LaTeX build intermediates (keep .tex and .pdf)
+*.aux
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.out
+*.toc
