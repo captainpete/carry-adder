@@ -3,6 +3,7 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath, amssymb, amsthm}
 \usepackage{microtype}
+\usepackage{graphicx}
 \usepackage[hidelinks]{hyperref}
 
 \newtheorem{theorem}{Theorem}
@@ -457,7 +458,20 @@ carry bits ($\approx 31$ per $32$-bit add) & $\approx 37{,}200$\\
 
 The two feed-forwards and the second hash each act as an independent
 carry reset (a fresh full-width operand), which is why they contribute
-more separation than their round count alone would suggest.
+more separation than their round count alone would suggest;
+Figure~\ref{fig:depth} traces the profile.
+
+\begin{figure}[t]
+\centering
+\includegraphics{figures/fig_depth_profile.pdf}
+\caption{Carry depth along the SHA-256d dataflow, from the minimum-depth
+accounting of \texttt{repro/carry\_depth.py}. The 64 rounds of the first
+compression lift the state by roughly three adder layers per round, each
+Davies--Meyer feed-forward adds a full-width carry layer, and the second
+hash repeats the climb to $386$. The solvable two-round regime sits at
+the origin.}
+\label{fig:depth}
+\end{figure}
 
 \subsection{Measuring the per-layer retention: the anchor sweep}
 \label{sec:anchor}
@@ -484,14 +498,26 @@ one round deeper ($\approx 3$ layers) & $\le 0.0011$ (consistent with $0$)\\
 \end{tabular}
 \end{center}
 
-The advantage \emph{cliffs}: it falls from $0.886$ to undetectable within
-a single round. There is no geometric tail to fit; $\rho \approx 0$
+The advantage \emph{cliffs} (Figure~\ref{fig:cliff}): it falls from
+$0.886$ to undetectable within a single round. There is no geometric tail to fit; $\rho \approx 0$
 (a one-layer reset). The mechanism is explicit: at the next round
 $\mathtt{state}[0]$ enters $\Sigma_0$, whose rotations scatter the
 controlled top byte across all bit positions, and is then re-randomized
 by a fresh carry chain, so the controlled structure is delocalized off
 the top-byte observable in one round. Information is preserved (the round
 is invertible); accessibility is destroyed.
+
+\begin{figure}[t]
+\centering
+\includegraphics{figures/fig_anchor_cliff.pdf}
+\caption{The anchor sweep (Section~\ref{sec:anchor}): selection advantage
+of the carry-aware score read $j$ rounds past the read point, against the
+geometric decay suggested by the carry Markov heuristic of
+Section~\ref{sec:markov}. The measurement returns a cliff rather than a
+slope; past one round every value sits within the $\approx 10^{-3}$
+detection limit of zero.}
+\label{fig:cliff}
+\end{figure}
 
 \subsection{The combined statement}
 
@@ -588,15 +614,30 @@ across independent stems and at a shifted read point, and remains null
 under a $90\times$ model-capacity, $64\times$ training-data, and $8\times$
 training-time scaling of the learned attacker (each scaled run compared
 against its own shuffled-label noise ceiling)---the same single-round
-cliff, now traced by a strictly stronger member of the attack class.
+cliff, now traced by a strictly stronger member of the attack class
+(Figure~\ref{fig:neural}a).
 Control runs locate the failure at the mechanism itself: the same
 architecture learns the top byte of pure $k$-operand modular sums for
-$k\le3$ and fails for $k\ge4$, so the learned attacker expires on carry
-composition as such, on data with no $\SHA$ structure at all. The same carry-depth mechanism that bounds the
+$k\le3$ and fails for $k\ge4$ (Figure~\ref{fig:neural}b), so the learned
+attacker expires on carry composition as such, on data with no $\SHA$
+structure at all. The same carry-depth mechanism that bounds the
 attack class also \emph{retrodicts} the qualitative behaviour observed in
 those experiments, in particular the round-invariance of the local
 advantage (it is always a depth-one quantity) and its destruction by the
 chaining-variable addition (a single extra carry layer).
+
+\begin{figure}[t]
+\centering
+\includegraphics{figures/fig_neural.pdf}
+\caption{The learned attacker. (a)~Maximum selection advantage of the
+neural distinguisher and the hand-built score across prediction depths,
+against the pre-registered candidate-signal gate and the shuffled-label
+control: the network beats the hand score where signal exists ($j=0$)
+and joins the noise floor one round deeper. (b)~The same architecture on
+pure $k$-operand modular sums, no $\SHA$ structure present: two chained
+additions are learnable, three are not.}
+\label{fig:neural}
+\end{figure}
 
 % =====================================================================
 \section{Reproduction}\label{sec:repro}
