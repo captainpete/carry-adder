@@ -82,10 +82,12 @@ def fig_depth_profile():
     ax.axhline(386, color=GRAY, lw=0.6, ls=(0, (4, 3)))
     ax.axvline(65, color=GRAY, lw=0.6, ls=(0, (1, 2)))
 
-    ax.annotate("194", xy=(0, 194), xytext=(-2, 194), ha="right",
-                va="center", fontsize=8, color="0.25")
-    ax.annotate("386", xy=(0, 386), xytext=(-2, 386), ha="right",
-                va="center", fontsize=8, color="0.25")
+    ax.annotate("194", xy=(130, 194), xytext=(131.5, 194), ha="left",
+                va="center", fontsize=8, color="0.25",
+                annotation_clip=False)
+    ax.annotate("386", xy=(130, 386), xytext=(131.5, 386), ha="left",
+                va="center", fontsize=8, color="0.25",
+                annotation_clip=False)
     ax.annotate("feed-forward,\nsecond hash begins", xy=(65, 200),
                 xytext=(72, 255), fontsize=8, color="0.25",
                 arrowprops=dict(arrowstyle="-", lw=0.6, color=GRAY))
