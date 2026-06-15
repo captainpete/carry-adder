@@ -620,7 +620,13 @@ Control runs locate the failure at the mechanism itself: the same
 architecture learns the top byte of pure $k$-operand modular sums for
 $k\le3$ and fails for $k\ge4$ (Figure~\ref{fig:neural}b), so the learned
 attacker expires on carry composition as such, on data with no $\SHA$
-structure at all. The same carry-depth mechanism that bounds the
+structure at all. This $k\ge4$ failure is a genuine
+optimisation/trainability barrier, not an artefact of finite feature
+precision: it survives rebuilding the operand features and the entire
+network in double precision (a seed-paired \texttt{float32}-vs-\texttt{float64}
+comparison leaves the advantage at the noise floor in both arms, $0/6$
+seeds learning in either precision), so restoring full operand resolution
+does not let gradient descent find the carry circuit. The same carry-depth mechanism that bounds the
 attack class also \emph{retrodicts} the qualitative behaviour observed in
 those experiments, in particular the round-invariance of the local
 advantage (it is always a depth-one quantity) and its destruction by the
