@@ -398,3 +398,56 @@ feature-selection artefacts; combined with the float64 result (not
 precision), "the learned attacker expires on carry composition as such"
 stands. The paper is left as-is; cause 2 is recorded here as attacker
 phenomenology, not a paper claim.
+
+## 2026-06-15 — Probability-space analysis: the k-cliff is the learner's edge, not the carry's
+
+Analytic (no new runs). Treat each input bit as iid Bernoulli(1/2) and
+look at the induced law on the carries; this pins down what is and isn't
+intrinsic about the k>=4 cliff.
+
+**The k-operand carry chain is Holte's "amazing matrix."** Summing k
+operands bit-by-bit, the carry is the integer Markov chain
+`c_{i+1} = floor((c_i + S_i)/2)`, `S_i ~ Binomial(k, 1/2)`, on states
+`{0,...,k-1}`. Computed by hand (reflection-symmetry block-diagonalisation)
+for k=2..5 and matching Holte (1997) / Diaconis–Fulman (2009): the
+eigenvalues are exactly `{2^-j : j=0..k-1}`.
+
+| k | states | eigenvalues | λ₂ (gap) |
+|---|---|---|---|
+| 2 | 2 | 1, ½ | ½ |
+| 3 | 3 | 1, ½, ¼ | ½ |
+| 4 | 4 | 1, ½, ¼, ⅛ | ½ |
+| 5 | 5 | 1, ½, ¼, ⅛, 1/16 | ½ |
+
+**The spectral gap is k-invariant: λ₂ = ½ for every k.** Adding operands
+only introduces *faster*-decaying modes (⅛, 1/16, …); it never produces a
+slower one. So the carry chain's intrinsic correlation-decay rate (2^-d
+per bit position) is set by the *base*, not the operand count. Nothing in
+the carry's own mixing singles out k=4.
+
+**Consequence (corroborates the float64 and feature-isolation probes).**
+The k>=4 learnability cliff therefore has *no counterpart* in the carry
+chain's mixing — it is the **learner's** edge (gradient descent over fixed
+features), not an intrinsic property of carry composition. This is a
+third, independent line (pure probability) reaching the same place as the
+float64 null (not precision) and the feature-isolation probe (a separate
+distractor weakness): the wall at k=4 is about the attacker, while the
+intrinsic, k-invariant `2^-d` decay is the real cryptographic quantity.
+The paper records this as a scope clarification ("One contraction, several
+observables") rather than as support for intrinsic hardness.
+
+**Two decay scales (resolves the cliff-vs-slope tension).** The `2^-d`
+geometric decay lives on the *bit-position* axis within one addition. The
+*round* axis is different: one SHA round applies Σ₀ (re-scatters the
+controlled byte) plus a fresh carry chain, i.e. a full mixing time, so the
+downstream advantage collapses in one round (the measured cliff) rather
+than decaying as a per-round `ρ^d` slope. The naive Markov heuristic
+conflated one carry step with one round.
+
+**Stem-yield unification.** The same contraction bounds stem selection:
+`|P(hit|stem) − P(hit)| ≲ 2^-d` and `Var_stems ≲ 2^-2d`. For SHA-256d,
+d ~ 386 layers, so the bias sits far below the `2^-32` resolution of a
+best-of-N nonce search — the bs2 0150 stem-exchangeability null is forced,
+not contingent. Stem yield, the hand score, and the learned distinguisher
+are three observables of one contraction coefficient (the measured
+ρ ≤ 0.0011). Folded into the paper's scope section.

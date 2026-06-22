@@ -411,6 +411,13 @@ decays geometrically,
 \[
   \Pr[\gamma_i = 0] = \tfrac12 + 2^{-(i+1)}.
 \]
+This is Holte's carry matrix~\cite{holte}: in base $2$, summing $k$
+operands gives a $k$-state carry chain on $\{0,\dots,k-1\}$ whose
+eigenvalues are exactly $\{2^{-j}:0\le j<k\}$---the same matrix that
+governs the base-$2$ riffle shuffle~\cite{diaconisfulman}---so the second
+eigenvalue, and hence the per-bit contraction rate, is $\tfrac12$
+\emph{independent of the operand count}. Extra operands only introduce
+faster-decaying modes; the gap is fixed by the base, never by $k$.
 The carry-in becomes a fair coin $\sim i$ positions above the anchor, and
 chaining adders composes these contractions, which suggests that
 exploitable advantage decays as roughly $2^{-\Theta(\text{carry depth})}$,
@@ -631,6 +638,31 @@ attack class also \emph{retrodicts} the qualitative behaviour observed in
 those experiments, in particular the round-invariance of the local
 advantage (it is always a depth-one quantity) and its destruction by the
 chaining-variable addition (a single extra carry layer).
+
+\paragraph{One contraction, several observables.}
+We read the $k\ge4$ threshold as the learner's reach, not an intrinsic
+boundary of the arithmetic. The $k$-operand carry chain contracts at rate
+$\tfrac12$ for \emph{every} $k$ (Section~\ref{sec:markov}: its eigenvalues
+are $\{2^{-j}\}$, so larger $k$ only adds faster modes), and nothing in
+the carry's own mixing singles out $k{=}4$. What the control isolates is
+the reach of gradient descent over fixed features at composing carries---a
+statement about the attack class, consistent with the residual of
+Section~\ref{sec:scope}, not a claim that carry composition is
+information-theoretically hard at a particular operand count. The same
+contraction bounds stem selection: under the idealization of
+Section~\ref{sec:markov}, a stem fixes input bits whose influence on the
+digest contracts as $2^{-d}$ across the $d$ carry layers separating them
+from the output, so any bias obeys $\bigl|\Pr[\text{hit}\mid\text{stem}] -
+\Pr[\text{hit}]\bigr|\lesssim 2^{-d}$ with across-stem variance
+$\lesssim 2^{-2d}$. For $\SHAd$, $d$ is the full dataflow depth
+($\sim\!386$ layers), placing this bias far below the
+$2^{-\log_2 N}\!\approx\!2^{-32}$ resolution of any feasible best-of-$N$
+nonce search; the extreme-value yield model's i.i.d.\ assumption thus
+holds to hundreds of bits beyond what the search can resolve, and the
+stem-exchangeability null is forced rather than contingent. The measured
+retention $\rho\le 0.0011$ (Section~\ref{sec:anchor}) is the empirical
+form of the same coefficient: stem yield, the hand-built score, and the
+learned distinguisher are three observables of one contraction.
 
 \begin{figure}[t]
 \centering
@@ -853,6 +885,16 @@ Bitcoin Improvement Proposals, 2018.
 A.~Gohr.
 \emph{Improving Attacks on Round-Reduced Speck32/64 Using Deep Learning.}
 CRYPTO 2019.
+
+\bibitem{holte}
+J.~M.~Holte.
+\emph{Carries, Combinatorics, and an Amazing Matrix.}
+American Mathematical Monthly 104(2), 1997.
+
+\bibitem{diaconisfulman}
+P.~Diaconis, J.~Fulman.
+\emph{Carries, Shuffling, and an Amazing Matrix.}
+American Mathematical Monthly 116(9), 2009.
 
 \end{thebibliography}
 
